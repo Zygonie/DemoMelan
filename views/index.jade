@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  div.container
+    div.jumbotron.text-center
+      a(href="http://cliniquedesoinsinfirmiers.com/", title="Clinique de soins infirmiers de Lévis")
+        div.site-logo 
+      p Login or Register with:
+      a.btn.btn-default(href="/login")
+        span.fa.fa-user
+        |  Login
+      a.btn.btn-default(href="/signup")
+        span.fa.fa-user
+        |  Signup

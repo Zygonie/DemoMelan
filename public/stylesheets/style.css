@@ -1,0 +1,76 @@
+body {
+  padding: 70px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.site-logo{
+  background: url(../images/site-logo.png) top left no-repeat;
+  display:block;
+  width:317px;
+  height:100px;
+  float:left;}
+}
+
+@keyframes fadeAnim {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+@-moz-keyframes fadeAnim {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+@-webkit-keyframes fadeAnim {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+@-ms-keyframes fadeAnim {
+    from {opacity: 0;}
+    to {opacity: 1;}
+}
+
+.fade{
+    -moz-animation-name: fadeAnim;
+    -moz-animation-duration: 1s;
+    -moz-animation-fill-mode: forwards;  
+    -webkit-animation-name: fadeAnim;
+    -webkit-animation-duration: 1s;
+    -webkit-animation-fill-mode: forwards;  
+    -ms-animation-name: fadeAnim;
+    -ms-animation-duration: 1s;
+    -ms-animation-fill-mode: forwards;  
+    animation-name: fadeAnim;
+    animation-duration: 1s;
+    animation-fill-mode: forwards;  
+}
+
+.logout {
+  margin-right: 20px !important;
+  color: #ffffff !important;
+}
+
+.flash{
+  top: 0;
+  position: fixed;  
+  right: 0;
+  left: 0;
+  z-index: 1050;
+  height: 60px;
+  border-radius: 0;
+  font-size: 18px;  
+  -moz-animation-name: fadeAnim;
+  -moz-animation-duration: 1s;
+  -moz-animation-fill-mode: forwards;  
+  -webkit-animation-name: fadeAnim;
+  -webkit-animation-duration: 1s;
+  -webkit-animation-fill-mode: forwards;  
+  -ms-animation-name: fadeAnim;
+  -ms-animation-duration: 1s;
+  -ms-animation-fill-mode: forwards;  
+  animation-name: fadeAnim;
+  animation-duration: 1s;
+  animation-fill-mode: forwards; 
+}

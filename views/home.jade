@@ -1,0 +1,32 @@
+doctype 5
+html(ng-app="appClient")
+  head
+    title Demo pour Melanie 
+    link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css")
+    link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src='http://code.jquery.com/jquery-2.1.1.min.js')
+    script(src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js")
+    script(src="https://code.angularjs.org/1.2.20/angular.min.js")
+    script(src="https://code.angularjs.org/1.2.20/angular-resource.min.js")
+    script(src="https://code.angularjs.org/1.2.20/angular-route.min.js")
+    script(src="//cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.10.0/ui-bootstrap-tpls.min.js")
+    script(src="/js/app/appClient.js")
+    script(src="/js/controller/ctrlClient.js")
+    script(src="/js/controller/ctrlClientDetails.js")
+    script(src="/js/controller/ctrlInterventions.js")
+    script(src="/js/controller/ctrlNavBar.js")
+  body  
+    nav.navbar.navbar-inverse.navbar-fixed-top(role="navigation", ng-controller='ctrlNavBar')
+      div.container-fluid
+        div.navbar-header
+          a.navbar-brand(ng-click='goHome()') DemoMelan
+        div
+          ul.nav.navbar-nav
+            li(ng-class="{ active: isActive('/client')}")
+              a(href='/client') Client
+            li(ng-class="{ active: isActive('/interventions')}")
+              a(href='/interventions') Interventions
+          ul.nav.navbar-nav.navbar-right    
+            li
+              a.btn.btn-primary.logout(ng-click='goHome()') Log out  
+    div.container-fluid(ng-view)

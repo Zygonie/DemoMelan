@@ -1,0 +1,44 @@
+div.row-fluid(ng-init='initCtrl()') 
+  div.alert.alert-danger.flash(ng-show="flash.getErrorMessage()")
+    {{flash.getErrorMessage()}}
+    span.pull-right(ng-click="flash.clear()")
+      i.glyphicon.glyphicon-remove
+  div.alert.alert-success.flash(ng-show="flash.getSuccessMessage()")
+    {{flash.getSuccessMessage()}}
+    span.pull-right(ng-click="flash.clear()")
+      i.glyphicon.glyphicon-remove
+div.row-fluid
+  div.col-md-4  
+    div.panel.panel-info
+      div.panel-heading Recherche / Ajout de client
+      div.panel-body  
+        form.form-horizontal(role="form")        
+          div.form-group
+            label.col-md-4.control-label Nom
+            div.col-md-8
+              input.form-control(ng-model="client.name")
+          div.form-group
+            label.col-md-4.control-label Prenom
+            div.col-sm-8
+              input.form-control(ng-model="client.forename")
+          div.form-group(ng-class="{'has-error': !validePhone}")
+            label.col-md-4.control-label Telephone
+            div.col-md-8
+              input.form-control(ng-model="client.phone")
+          div.btn-toolbar.pull-right(role='toolbar')
+            button.btn.btn-primary(ng-click="getClient()") Find
+            button.btn.btn-primary(ng-click="addClient()") Add
+  div.col-md-8
+    div.panel.panel-primary(ng-show='showPanel', ng-class='{fade: showPanel}')
+      div.panel-heading Result
+      table.table.table-striped
+        thead
+          tr
+            th Nom
+            th Prenom
+            th Telephone
+        tbody
+          tr(ng-repeat="client in clients", ng-click="openClient(client)")
+            td {{client.name}}
+            td {{client.forename}}
+            td {{client.phone}}

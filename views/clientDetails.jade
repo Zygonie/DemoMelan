@@ -1,0 +1,57 @@
+div.row-fluid(ng-init='initDetails()')  
+  div.alert.alert-danger.flash(ng-show="flash.getErrorMessage()")
+    {{flash.getErrorMessage()}}
+    span.pull-right(ng-click="flash.clear()")
+      i.glyphicon.glyphicon-remove
+  div.alert.alert-success.flash(ng-show="flash.getSuccessMessage()")
+    {{flash.getSuccessMessage()}}
+    span.pull-right(ng-click="flash.clear()")
+      i.glyphicon.glyphicon-remove
+div.row-fluid
+  div.col-md-4
+    div.panel.panel-info
+      div.panel-heading Ajouter une intervention
+      div.panel-body  
+        form.form-horizontal(role="form")        
+          div.form-group
+            label.col-md-4.control-label Date
+            div.col-md-8
+              p.input-group
+                input.form-control(type="text", datepicker-popup="dd MMMM yyyy", ng-model="intervention.date", is-open="opened", min-date="minDate", max-date="'2015-06-22'", datepicker-options="dateOptions", date-disabled="disabled(date, mode)", ng-required="true", close-text="Close")
+                span.input-group-btn
+                  button.btn.btn-default(type="button", ng-click="open($event)")
+                    i.glyphicon.glyphicon-calendar
+          div.form-group
+            label.col-md-4.control-label Type
+            div.col-md-8
+              select.form-control(ng-model="intervention.type", ng-options="type.name for type in types")
+          div.form-group
+            div.col-md-8.col-md-offset-4
+              textarea.form-control(rows="3", ng-model="intervention.type.description")
+          div.form-group
+            label.col-md-4.control-label Notes
+            div.col-md-8
+              textarea.form-control(rows="3", ng-model="intervention.notes")    
+          div.form-group
+            label.col-md-4.control-label Prix
+            div.col-md-8
+              input.form-control(ng-model="intervention.price")
+          div.btn-toolbar.pull-right(role='toolbar')
+            button.btn.btn-primary(ng-click="addIntervention()") Add
+  div.col-md-6.col-md-offset-1 
+    div.panel.panel-primary(ng-show='showPanel', ng-class='{fade: showPanel}')
+      div.panel-heading Result 
+      table.scrollTable.table.table-striped
+        thead
+          tr
+            th Date
+            th Type
+            th Price
+        tbody
+          tr(ng-repeat="item in interventions")
+            td {{item.date | date : 'dd MMMM yyyy'}}
+            td {{item.type.name}}
+            td {{item.price}}
+            td 
+              button.btn.btn-primary.btn-xs.pull-right(ng-click="removeIntervention(item)")
+                i.glyphicon.glyphicon-remove

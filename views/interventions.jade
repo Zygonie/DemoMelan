@@ -1,0 +1,40 @@
+div.row-fluid(ng-init='initCtrl()') 
+  div.alert.alert-danger.flash(ng-show="flash.getErrorMessage()")
+    {{flash.getErrorMessage()}}
+    span.pull-right(ng-click="flash.clear()")
+      i.glyphicon.glyphicon-remove
+  div.alert.alert-success.flash(ng-show="flash.getSuccessMessage()")
+    {{flash.getSuccessMessage()}}
+    span.pull-right(ng-click="flash.clear()")
+      i.glyphicon.glyphicon-remove
+div.row-fluid
+  div.col-md-6.col-md-offset-3
+    div.panel.panel-info
+      div.panel-heading Types d'interventions médicales
+      div.panel-body  
+        form.form-horizontal(role="form")        
+          div.form-group
+            label.col-md-4.control-label Nom
+            div.col-md-8
+              input.form-control(ng-model="intervention.name")
+          div.form-group
+            label.col-md-4.control-label Description
+            div.col-sm-8
+              textarea.form-control(rows="3", ng-model="intervention.description")
+          div.pull-right(role='toolbar')
+            button.btn.btn-primary(ng-click="addInterventionType()") Save
+  div.col-md-10.col-md-offset-1        
+    div.panel.panel-primary.panelScroll
+      div.panel-heading Result
+      table.table.table-striped
+        thead
+          tr
+            th Nom
+            th Description
+        tbody    
+          tr(ng-repeat="item in interventions", ng-click="showInterventionType(item)")
+            td {{item.name}}
+            td {{item.description}}
+            td 
+              button.btn.btn-primary.btn-xs.pull-right(ng-click="removeInterventionType(item)")
+                i.glyphicon.glyphicon-remove
