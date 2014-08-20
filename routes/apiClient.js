@@ -16,7 +16,13 @@ exports.getClient = function(req,res) {
 	else {
       if(id){
         Client.findById(id, function(err, client){
-          res.json(client);
+          if(err){
+              console.log(err);
+              res.status(500).send({ error: err.toString() });
+          }
+          else{
+             res.json(client);
+          }
         });
       }
       else{
@@ -25,7 +31,13 @@ exports.getClient = function(req,res) {
         if(forename){ query.forename = new RegExp('^'+ forename +'.*$', "i"); }
         if(phone){ query.phone = phone; }
         Client.find(query, function(err, clients){
-          res.json(clients);
+            if(err){
+                console.log(err);
+                res.status(500).send({ error: err.toString() });
+            }
+            else{
+               res.json(clients);
+            }
         });
       }
 	}
@@ -42,6 +54,7 @@ exports.createClient = function(req, res) {
 	client.save(function(err) {
         if(err) {
 			console.log(err);
+			res.status(500).send({ error: err.toString() });
 		}
 		else {
 			console.log('New client ' + client.forename + " " + client.name + " has been created.");
@@ -55,6 +68,7 @@ exports.removeClient = function(req,res) {
 	Client.findByIdAndRemove(clientId, function(err, client) {
 		if (err) {
 			console.log('An error hase occured while trying to delete client with Id: ' + clientId);
+			res.status(500).send({ error: err.toString() });
 		}
 		else {
 			console.log('Client with Id ' + clientId + ' has well been removed from DB');
@@ -69,7 +83,7 @@ exports.updateClient = function(req, res) {
 	Client.update({'username':client.username},client,{safe:true}, function(err, result){
 		if(err) {
 			console.log('Error updating client. ' + err);
-			res.redirect('/client');
+			res.status(500).send({ error: err.toString() });
 		}
 		else{
 			console.log('' + result + ' client ' + client.username + ' updated for user: ');

@@ -15,6 +15,7 @@
     favicon = require('serve-favicon'),
     errorhandler = require('errorhandler'),
     session = require('express-session'),
+    RedisStore = require('connect-redis')(session),
     passport = require('passport'),
     flash = require('connect-flash'),
     fs = require('fs');
@@ -26,6 +27,7 @@
      routes = require('./routes/routes'),
      apiClient = require('./routes/apiClient'),
      apiInterventions = require('./routes/apiInterventions'),
+     apiInterventionTypes = require('./routes/apiInterventionTypes'),
      pass = require('./config/pass');
 
  /*
@@ -61,7 +63,31 @@ app.use(express.static(path.join(__dirname, 'public')));// set the static files 
 app.use(errorhandler());
 
 //required for passport
-app.use(session({ secret: 'topsecretveryefficientpassword' })); // session secret
+var env = process.env.NODE_ENV || 'development';
+//Use browser cookies for development purpose
+if('development' === env){
+  app.use(session({
+    secret: 'topsecretveryefficientpassword',
+    resave: true,
+    saveUninitialized: true
+  })); // session secret
+}
+
+if('production' === env){
+  // Configure redis for production purpose
+  var redisUrl = url.parse(process.env.REDISTOGO_URL);
+  var redisAuth = redisUrl.auth.split(':');
+  app.use(express.session({
+    secret: process.env.REDIS_PWD,
+    store: new RedisStore({
+      host: redisUrl.hostname,
+      port: redisUrl.port,
+      db: redisAuth[0],
+      pass: redisAuth[1]
+    })
+  }));
+}
+
 app.use(passport.initialize());
 app.use(passport.session()); // persistent login sessions
 app.use(flash()); // use connect-flash for flash messages stored in session
@@ -91,9 +117,9 @@ app.route('/api/interventions').get(pass.ensureAuthenticated, apiInterventions.g
                                .post(pass.ensureAuthenticated, apiInterventions.saveIntervention)
                                .delete(pass.ensureAuthenticated, apiInterventions.removeIntervention);
 
-app.route('/api/interventionTypes').get(pass.ensureAuthenticated, apiInterventions.getInterventionTypes)
-                                   .post(pass.ensureAuthenticated, apiInterventions.saveInterventionType)
-                                   .delete(pass.ensureAuthenticated, apiInterventions.removeInterventionType);
+app.route('/api/interventionTypes').get(pass.ensureAuthenticated, apiInterventionTypes.getInterventionTypes)
+                                   .post(pass.ensureAuthenticated, apiInterventionTypes.saveInterventionType)
+                                   .delete(pass.ensureAuthenticated, apiInterventionTypes.removeInterventionType);
 
 
 app.listen(app.get('port'));

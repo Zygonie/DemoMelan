@@ -26,18 +26,17 @@ function ctrlClient($scope, $log, $route, $http, $location, $timeout, Api, Flash
         prenom = $scope.client.forename,
         phone = $scope.client.phone;
     $scope.clients = {};
-    
        
-      Api.Clients.query({nom:nom, prenom:prenom, phone:phone}, function(res){
-        if(res.length === 0){
-          $scope.flash.showError('Aucun client trouvé');
-          $scope.clearFlash();
-        }
-        else{
-          $scope.clients = res;
-          $scope.showPanel = true;
-        }
-      });
+    Api.Clients.query({nom:nom, prenom:prenom, phone:phone}, function(res){
+      if(res.length === 0){
+        $scope.flash.showError('Aucun client trouvé');
+        $scope.clearFlash();
+      }
+      else{
+        $scope.clients = res;
+        $scope.showPanel = true;
+      }
+    });
   };
     
   $scope.addClient = function() {
@@ -46,7 +45,7 @@ function ctrlClient($scope, $log, $route, $http, $location, $timeout, Api, Flash
     var regex = /^[0-9]{3}-[0-9]{3}-[0-9]{4}$/;
     if(regex.test($scope.client.phone)){
       var newClient = new Api.Clients($scope.client);
-      newClient.$create(function(client) {
+      newClient.$save(function(client) {
         if(!client){
           $log.log('Impossible to create new client');
           $scope.flash.showError("Le nouveau client n'a pu être créé.");
@@ -59,7 +58,7 @@ function ctrlClient($scope, $log, $route, $http, $location, $timeout, Api, Flash
         }
       },
       function(error){
-        $scope.flash.showError('Impossible de créer le nouveau client. ' + error);
+        $scope.flash.showError('Impossible de créer le nouveau client. ' + error.data.error);
         $scope.clearFlash();
       });
     }

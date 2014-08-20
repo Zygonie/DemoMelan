@@ -8,34 +8,39 @@ function ctrlInterventions($scope, $log, $route, $http, $window, $timeout, Api, 
     $scope.flash = FlashService;
     $scope.flash.clear();
 
-    Api.InterventionTypes.query({}, function(interventions){
-      $scope.interventions = interventions;
-    });
+    GetAllInterventionTypes();
     
     $scope.clearFlash = function(){$timeout(function(){
         $scope.flash.clear();
       }, 5000);};
   };
   
+  var GetAllInterventionTypes = function(next){
+    Api.InterventionTypes.query({}, function(interventions){
+      $scope.interventions = interventions;
+      next();
+    });
+  };
+  
   $scope.addInterventionType = function(){
     if($scope.intervention._id){
-      $scope.intervention.$update({ Id: $scope.intervention._id },
+      $scope.intervention.$save({ Id: $scope.intervention._id },
         function (intervention) { //success
           if (intervention){
             $scope.flash.showSuccess('Intervention mise à jour');
             $scope.clearFlash();
-            $scope.intervention = {};
+            GetAllInterventionTypes(function(){$scope.intervention = {};});            
           }
         },
         function (err) { //error
-          $log.log("Impossible de mettre à jour l'intervention");
-          $scope.flash.showError("La nouvelle intervention n'a pu être mise à jour");
+          $log.log("Impossible de mettre à jour l'intervention : " + err.data.error);
+          $scope.flash.showError("La nouvelle intervention n'a pu être mise à jour : " + err.data.error);
           $scope.clearFlash();
         });
     }
     else{
       var newInterventionType = new Api.InterventionTypes($scope.intervention);
-      newInterventionType.create(function(intervention){
+      newInterventionType.$save(function(intervention){
         if(!intervention){
           $log.log('Impossible to create new intervention');
           $scope.flash.showError("La nouvelle intervention n'a pu être créé");
@@ -43,12 +48,12 @@ function ctrlInterventions($scope, $log, $route, $http, $window, $timeout, Api, 
         }
         else {
           $scope.flash.showSuccess('Intervention ajouté');
+          GetAllInterventionTypes(function(){$scope.intervention = {};});
           $scope.clearFlash();
-          $scope.client = {};
         }
       },
       function(error){
-        $scope.flash.showError('Impossible de créer la nouvelle intervention ' + error);
+        $scope.flash.showError('Impossible de créer la nouvelle intervention ' + error.data.error);
         $scope.clearFlash();
       });
     }
@@ -74,6 +79,8 @@ function ctrlInterventions($scope, $log, $route, $http, $window, $timeout, Api, 
         }
       },
       function (err) { //error
+        $scope.flash.showError("Impossible de supprimer le type d'intervention " + err.data.error);
+        $scope.clearFlash();
       });
   };
 }

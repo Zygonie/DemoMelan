@@ -38,41 +38,9 @@ app.factory('SharedService', function($rootScope) {
 
 app.factory('Api',['$resource', function($resource) {
   return {
-    Clients: $resource('/api/client', //sans parametre ici, on utilise plutot un req.query au lieu d'un req.params !! pratique
-     { },
-     {
-       query:{
-         method: 'GET',
-         isArray: true },
-       get:{
-         method: 'GET',
-         isArray: false },
-       create: {
-         method: 'POST'
-       }
-     }),
-     Interventions: $resource('/api/interventions',
-       { },
-       {
-         query:{
-           method: 'GET',
-           isArray: true
-         },
-         create: {
-           method: 'POST'
-         }
-     }),
-     InterventionTypes: $resource('/api/interventionTypes',
-       { },
-       {
-         query:{
-           method: 'GET',
-           isArray: true
-         },
-         create: {
-           method: 'POST'
-         }
-     })
+    Clients: $resource('/api/client'), //sans parametre ici, on utilise plutot un req.query au lieu d'un req.params !! pratique
+    Interventions: $resource('/api/interventions'),
+    InterventionTypes: $resource('/api/interventionTypes')
   };
 }]);
 

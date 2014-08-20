@@ -21,13 +21,13 @@ exports.saveIntervention = function(req, res) {
 	
   if(interventionId){
     delete intervention._id;
-    Intervention.update({'username':intervention.username},intervention,{safe:true}, function(err, result){
+    Intervention.findByIdAndUpdate(interventionId, intervention, {safe:true}, function(err, result){
       if(err) {
-        console.log('Error updating client. ' + err);
-        res.json(intervention);
+        console.log('Error updating intervention of type ' + intervention.type + ' with message: ' + err);
+        res.status(500).send({ error: err.toString() });
       }
-      else{
-        console.log('Intervention of type ' + intervention.type+ ' updated for client ' + intervention.clientID);
+      else {
+        console.log('Intervention of type ' + intervention.type + ' updated');
         res.json(intervention);
       }
     });
@@ -37,6 +37,7 @@ exports.saveIntervention = function(req, res) {
     newIntervention.save(function(err) {
       if(err) {
         console.log(err);
+        res.status(500).send({ error: err.toString() });
       }
       else {
 		console.log('New intervention ' + intervention.type + " for client " + intervention.clientID + " has been created.");
@@ -52,6 +53,7 @@ exports.removeIntervention = function(req, res) {
   Intervention.findByIdAndRemove(interventionID, function(err, intervention) {
     if (err) {
       console.log('An error hase occured while trying to delete intervention with Id: ' + interventionID);
+      res.status(500).send({ error: err.toString() });
     }
     else {
       console.log('Intervention with Id ' + interventionID + ' has well been removed from DB');
@@ -59,56 +61,3 @@ exports.removeIntervention = function(req, res) {
     }
   });
 };
-
-/*
- * Intervention types
- */
-exports.getInterventionTypes = function(req, res){
-  InterventionType.find().exec(function(err, typesFound) {
-    res.json(typesFound);
-  });
-};
-
-exports.saveInterventionType = function(req, res) {
-  var interventionTypeId = req.query.Id;
-  var interventionType = req.body;
-		
-  if(interventionTypeId){
-    delete interventionType._id;
-    Intervention.findByIdAndUpdate(interventionTypeId, interventionType, {safe:true}, function(err, result){
-      if(err) {
-        console.log('Error updating intervention type ' + interventionType.name + ' with message: ' + err);
-        res.json(interventionType);
-      }
-      else {
-        console.log('Intervention type ' + interventionType.name + ' updated');
-       res.json(interventionType);
-      }
-    });
-  }
-  else{
-    var newInterventionType = new Intervention(interventionType);
-    newInterventionType.save(function(err) {
-      if(err) {
-        console.log(err);
-      }
-      else {
-        console.log('New intervention ' + interventionType.type + " for client " + interventionType.clientID + " has been created.");
-        res.json(interventionType);
-      }
-    });
-  }
-};
-
- exports.removeInterventionType = function(req, res) {
-  var interventionTypeID = req.query.Id;
-  InterventionType.findByIdAndRemove(interventionTypeID, function(err, interventionType) {
-    if (err) {
-      console.log('An error hase occured while trying to delete intervention type with Id: ' + interventionTypeID);
-    }
-    else {
-      console.log('Intervention type with Id ' + interventionTypeID + ' has well been removed from DB');
-      res.json(interventionType);
-    }
-  });
- };

@@ -5,7 +5,7 @@ function ctrlNavBar($window, $scope, $location) {
   };
     
   $scope.goHome = function(){
-    $window.location.href = '/';
+    $window.location.href = '/home';
   };
   
   $scope.logout = function(){

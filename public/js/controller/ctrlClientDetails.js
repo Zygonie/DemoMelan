@@ -42,52 +42,97 @@ function ctrlClientDetails($scope, $log, $route, $http, $location, $routeParams,
         else{
           $scope.client = res;
         }
+    },function (err) { //error
+        $log.log("Impossible de trouver le client");
+        $scope.flash.showError("Impossible de trouver le client : " + err.data.error);
+        $scope.clearFlash();
     });
 
     //Get its interventions
-    Api.Interventions.query({clientID: $scope.clientID}, function(interventions){
-      if(interventions.length === 0){
-        $scope.flash.showError('Aucune intervention trouvée');
-        $scope.clearFlash();
-      }
-      else{
-        $scope.interventions = interventions;
-        $scope.showPanel = true;
-      }
-    });
+    GetAllInterventionOfClient();
     
     //Get enumeration values  
-    Api.InterventionTypes.query({}, function(types){
-      $scope.types = types;
-      $scope.intervention.type = types[0];
-      $scope.intervention.date = Date.now();
-    });
+    GetInterventionTypes();
     
   };
   
-  $scope.addIntervention = function(){
-    $scope.flash.clear();
-    $scope.intervention.clientID = $scope.client._id;
-    $scope.intervention.type = $scope.intervention.type._id;
-    var newItem = new Api.Interventions($scope.intervention);
-    newItem.$create(function(intervention) {
-      if(!intervention){
-        $log.log('Impossible to create new intervention');
-        $scope.flash.showError("La nouvelle intervention n'a pu être créé.");
-        $scope.clearFlash();
-      }
-      else {
-        $scope.flash.showSuccess('Intervention ajoutée');
-        $scope.intervention.type = $scope.types[0];
-        $scope.intervention.date = Date.now();
-        $scope.intervention.price = {};
-        $scope.clearFlash();
-      }
-    },
-    function(error){
-      $scope.flash.showError('Impossible de créer la nouvelle intervention. ' + error);
-      $scope.clearFlash();
+  var GetAllInterventionOfClient = function(){
+    Api.Interventions.query({clientID: $scope.clientID}, function(interventions){  
+      if(interventions.length === 0){
+          $scope.flash.showError('Aucune intervention trouvée');
+          $scope.clearFlash();
+        }
+        else{
+          $scope.interventions = interventions;
+          $scope.showPanel = true;
+        }
+      },function (err) { //error
+          $log.log("Impossible de trouver les interventions");
+          $scope.flash.showError("Impossible de trouver les interventions : " + err.data.error);
+          $scope.clearFlash();
+      });
+  };
+  
+  var GetInterventionTypes = function(){
+    Api.InterventionTypes.query({}, function(types){
+      $scope.types = types;
+      InitializeInterventionPanel();
     });
+  };
+  
+  var InitializeInterventionPanel = function(){
+    $scope.intervention.type = $scope.types[0];
+    $scope.intervention.date = Date.now();
+    if($scope.intervention.notes){
+      delete $scope.intervention.notes;
+    }
+    if($scope.intervention.price){
+      delete $scope.intervention.price;
+    }
+  };
+  
+  $scope.saveIntervention = function(){
+    $scope.flash.clear();
+    if($scope.intervention._id){
+      var type = $scope.intervention.type;
+      $scope.intervention.type = $scope.intervention.type._id;
+      $scope.intervention.$save({ Id: $scope.intervention._id },
+        function (intervention) { //success
+          if (intervention){
+            $scope.flash.showSuccess('Intervention mise à jour');
+            GetAllInterventionOfClient();
+            InitializeInterventionPanel();
+            $scope.clearFlash();
+          }
+        },
+        function (err) { //error
+          $log.log("Impossible de mettre à jour l'intervention");
+          $scope.flash.showError("L'intervention n'a pu être mise à jour : " + err.data.error);
+          $scope.clearFlash();
+        });
+    }
+    else{
+      $scope.intervention.clientID = $scope.client._id;
+      $scope.intervention.type = $scope.intervention.type._id;
+      var newItem = new Api.Interventions($scope.intervention);
+      newItem.$save(function(intervention) {
+        if(!intervention){
+          $log.log('Impossible to create new intervention');
+          $scope.flash.showError("La nouvelle intervention n'a pu être créé.");
+          $scope.clearFlash();
+        }
+        else {
+          $scope.flash.showSuccess('Intervention ajoutée');
+          GetAllInterventionOfClient();
+          InitializeInterventionPanel();
+          $scope.clearFlash();
+        }
+      },
+      function(error){
+        $scope.flash.showError('Impossible de créer la nouvelle intervention : ' + error.data.error);
+        $scope.clearFlash();
+      });
+    }
   };
   
   $scope.removeIntervention = function (intervention, e) {
@@ -106,8 +151,18 @@ function ctrlClientDetails($scope, $log, $route, $http, $location, $routeParams,
         }
       },
       function (err) { //error
+        $scope.flash.showError("Impossible de supprimer l'intervention : " + err.data.error);
+        $scope.clearFlash();
       });
   };
   
+  $scope.showIntervention =function(intervention){
+    $scope.intervention = intervention;
+    $scope.types.forEach(function(item){
+      if(item.name === intervention.type.name){
+        intervention.type = item;
+      }
+    });
+  };
   
 }

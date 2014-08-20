@@ -37,7 +37,7 @@ div.row-fluid
             div.col-md-8
               input.form-control(ng-model="intervention.price")
           div.btn-toolbar.pull-right(role='toolbar')
-            button.btn.btn-primary(ng-click="addIntervention()") Add
+            button.btn.btn-primary(ng-click="saveIntervention()") Save
   div.col-md-6.col-md-offset-1 
     div.panel.panel-primary(ng-show='showPanel', ng-class='{fade: showPanel}')
       div.panel-heading Result 
@@ -46,12 +46,14 @@ div.row-fluid
           tr
             th Date
             th Type
-            th Price
+            th Prix
+            th Notes
         tbody
-          tr(ng-repeat="item in interventions")
+          tr(ng-repeat="item in interventions", ng-click="showIntervention(item)")
             td {{item.date | date : 'dd MMMM yyyy'}}
             td {{item.type.name}}
             td {{item.price}}
+            td {{item.notes}}
             td 
               button.btn.btn-primary.btn-xs.pull-right(ng-click="removeIntervention(item)")
                 i.glyphicon.glyphicon-remove
