@@ -27,24 +27,35 @@ passport.use('local-signup', new LocalStrategy({
       }
       //check to see if there's already a user with that username
       if (user) {
-        return done(null, false, req.flash('signupMessage', 'That username is already taken.'));
+        return done(null, false, req.flash('signupMessage', "Ce nom d'usager est déjà pris"));
       }
       else {
-        // if there is no user with that username
-        // create the user
-        var newUser = new User();
-
-        // set the user's local credentials
-        newUser.username = username;
-        newUser.email = req.body.email;
-        newUser.password = newUser.generateHash(password);
-
-        // save the user
-        newUser.save(function(err) {
+        User.findOne({ email: req.body.email }, function(err, user) {
           if (err) {
-            throw err;
+            return done(err);
           }
-          return done(null, newUser);
+          //check to see if there's already a user with that email
+          if (user) {
+            return done(null, false, req.flash('signupMessage', 'Cet email est déjà utilisé par un autre utilisateur'));
+          }
+          else {
+            // if there is no user with that email
+            // create the user
+            var newUser = new User();
+
+            // set the user's local credentials
+            newUser.username = username;
+            newUser.email = req.body.email;
+            newUser.password = newUser.generateHash(password);
+
+            // save the user
+            newUser.save(function(err) {
+              if (err) {
+                throw err;
+              }
+              return done(null, newUser);
+            });
+          }
         });
       }
    });
