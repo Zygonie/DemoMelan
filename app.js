@@ -76,7 +76,7 @@ if('production' === env){
   // Configure redis for production purpose
   var redisUrl = url.parse(process.env.REDISTOGO_URL);
   var redisAuth = redisUrl.auth.split(':');
-  app.use(express.session({
+  app.use(session({
     secret: process.env.REDIS_PWD,
     store: new RedisStore({
       host: redisUrl.hostname,
