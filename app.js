@@ -54,7 +54,7 @@ app.set('view engine', 'jade');
 app.use(morgan(':remote-addr :remote-user [:date] :method :url HTTP/:http-version :status :res[content-length] - :response-time ms',
 		{stream: process.stdout}));//{stream: logfile}));// log every request to the console
 app.use(favicon(__dirname + '/public/images/favicon.png'));
-app.use(cookieParser()); // read cookies (needed for auth)
+app.use(cookieParser(process.env.REDIS_PWD)); // read cookies (needed for auth)
 app.use(bodyParser.urlencoded({ extended: false })); // pull information from html in POST
 app.use(bodyParser.json()); // parse application/json
 app.use(methodOverride());
@@ -66,7 +66,7 @@ var env = process.env.NODE_ENV || 'development';
 //Use browser cookies for development purpose
 if('development' === env){
   app.use(session({
-    secret: 'topsecretveryefficientpassword',
+    secret: process.env.REDIS_PWD,
     resave: true,
     saveUninitialized: true
   })); // session secret
@@ -75,17 +75,14 @@ if('development' === env){
 if('production' === env){
   // Configure redis for production purpose
   var redisUrl = url.parse(process.env.REDISTOGO_URL);
-  var redisAuth = redisUrl.auth.split(':');
+  var store = new RedisStore({
+    url: redisUrl
+  });
   app.use(session({
     secret: process.env.REDIS_PWD,
     resave: true,
     saveUninitialized: true,
-    store: new RedisStore({
-      host: redisUrl.hostname,
-      port: redisUrl.port,
-      db: redisAuth[0],
-      pass: redisAuth[1]
-    })
+    store: store
   }));
 }
 
