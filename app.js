@@ -78,6 +78,8 @@ if('production' === env){
   var redisAuth = redisUrl.auth.split(':');
   app.use(session({
     secret: process.env.REDIS_PWD,
+    resave: true,
+    saveUninitialized: true,
     store: new RedisStore({
       host: redisUrl.hostname,
       port: redisUrl.port,
