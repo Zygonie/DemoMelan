@@ -33,8 +33,7 @@
  /*
   * Database connect 
   */
-var credentials = require('./config/mongoCredentials');
-var uristring = 'mongodb://' + credentials.user + ':' + credentials.password + '@kahana.mongohq.com:10072/DemoMelan';
+var uristring = 'mongodb://' + process.env.MONGOHQ_DEMOMELAN_USR + ':' + process.env.MONGOHQ_DEMOMELAN_PWD + '@' + process.env.MONGOHQ_DEMOMELAN_URL;
 var mongoOptions = { db: { safe: true } };
 mongoose.connect(uristring, mongoOptions, function (err, res) {
     if (err) {
