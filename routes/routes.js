@@ -12,10 +12,12 @@ exports.home = function(req, res){
 };
 	
 exports.client = function(req, res){
-  if(req.params.clientID)
-	  res.render('clientDetails');
-  else
-	  res.render('client');
+  if(req.params.clientID){
+    res.render('clientDetails');
+  }
+  else{
+    res.render('client');
+  }
 };
 
 exports.clientDetails = function(req, res){
