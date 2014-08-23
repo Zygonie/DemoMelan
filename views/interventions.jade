@@ -1,9 +1,9 @@
 div.row-fluid(ng-init='initCtrl()') 
-  div.alert.alert-danger(ng-class="{slidedown: slidedown, slideup: slideup}")
+  div.alert.alert-danger(ng-class="{slidedown: slidedownErr, slideup: slideupErr}")
     {{flash.getErrorMessage()}}
     span.pull-right(ng-click="flash.clear()")
       i.glyphicon.glyphicon-remove
-  div.alert.alert-success(ng-class="{slidedown: slidedown, slideup: slideup}")
+  div.alert.alert-success(ng-class="{slidedown: slidedownSucc, slideup: slideupSucc}")
     {{flash.getSuccessMessage()}}
     span.pull-right(ng-click="flash.clear()")
       i.glyphicon.glyphicon-remove
