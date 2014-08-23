@@ -7,9 +7,9 @@ var mongoose = require('mongoose'),
     InterventionType = require('../config/models/interventionTypes');
 
 exports.getInterventions = function(req, res){
-  var id = req.query.clientID;
-  Intervention.find({clientID: id})
-              .populate('type')
+  var id = req.query.client;
+  Intervention.find({client: id})
+              .populate('type client')
               .exec(function(err, interventions){
                 res.json(interventions);
               });
@@ -23,25 +23,43 @@ exports.saveIntervention = function(req, res) {
     delete intervention._id;
     Intervention.findByIdAndUpdate(interventionId, intervention, {safe:true}, function(err, result){
       if(err) {
-        console.log('Error updating intervention of type ' + intervention.type + ' with message: ' + err);
+        console.log('Error updating intervention of type ' + intervention.type.name + ' with message: ' + err);
         res.status(500).send({ error: err.toString() });
       }
       else {
-        console.log('Intervention of type ' + intervention.type + ' updated');
-        res.json(intervention);
+        Intervention.populate(result, {path:'type client'}, function(err,returnedIntervention){
+            if(err) {
+              console.log(err);
+              res.status(500).send({ error: err.toString() });
+            }
+            else {
+              console.log('Intervention of type ' + returnedIntervention.type.name + " for client " + returnedIntervention.client.forename + ' ' +
+                      returnedIntervention.client.name + " has been updated.");
+              res.json(returnedIntervention);
+            }
+        });
       }
     });
   }
   else{
     var newIntervention = new Intervention(intervention);
-    newIntervention.save(function(err) {
+    newIntervention.save(function(err, result) {
       if(err) {
         console.log(err);
         res.status(500).send({ error: err.toString() });
       }
       else {
-		console.log('New intervention ' + intervention.type + " for client " + intervention.clientID + " has been created.");
-		res.json(intervention);
+        Intervention.populate(result, {path:'type client'}, function(err,returnedIntervention){
+          if(err) {
+            console.log(err);
+            res.status(500).send({ error: err.toString() });
+          }
+          else {
+            console.log('New intervention ' + returnedIntervention.type.name + " for client " + returnedIntervention.client.forename + ' ' +
+                    returnedIntervention.client.name + " has been created.");
+            res.json(returnedIntervention);
+          }
+        });
       }
     });
   }

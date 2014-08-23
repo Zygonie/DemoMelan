@@ -1,9 +1,9 @@
 div.row-fluid(ng-init='initCtrl()') 
-  div.alert.alert-danger.flash(ng-show="flash.getErrorMessage()")
+  div.alert.alert-danger(ng-class="{slidedown: slidedown, slideup: slideup}")
     {{flash.getErrorMessage()}}
     span.pull-right(ng-click="flash.clear()")
       i.glyphicon.glyphicon-remove
-  div.alert.alert-success.flash(ng-show="flash.getSuccessMessage()")
+  div.alert.alert-success(ng-class="{slidedown: slidedown, slideup: slideup}")
     {{flash.getSuccessMessage()}}
     span.pull-right(ng-click="flash.clear()")
       i.glyphicon.glyphicon-remove
@@ -22,7 +22,7 @@ div.row-fluid
             div.col-sm-8
               textarea.form-control(rows="3", ng-model="intervention.description")
           div.pull-right(role='toolbar')
-            button.btn.btn-primary(ng-click="addInterventionType()") Save
+            button.btn.btn-primary(ng-click="saveInterventionType()") Save
   div.col-md-10.col-md-offset-1        
     div.panel.panel-primary.panelScroll
       div.panel-heading Result

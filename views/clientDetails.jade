@@ -1,9 +1,9 @@
 div.row-fluid(ng-init='initDetails()')  
-  div.alert.alert-danger.flash(ng-show="flash.getErrorMessage()")
+  div.alert.alert-danger(ng-class="{slidedown: slidedownErr, slideup: slideupErr}")
     {{flash.getErrorMessage()}}
     span.pull-right(ng-click="flash.clear()")
       i.glyphicon.glyphicon-remove
-  div.alert.alert-success.flash(ng-show="flash.getSuccessMessage()")
+  div.alert.alert-success(ng-class="{slidedown: slidedownSucc, slideup: slideupSucc}")
     {{flash.getSuccessMessage()}}
     span.pull-right(ng-click="flash.clear()")
       i.glyphicon.glyphicon-remove
@@ -40,7 +40,7 @@ div.row-fluid
             button.btn.btn-primary(ng-click="saveIntervention()") Save
   div.col-md-6.col-md-offset-1 
     div.panel.panel-primary(ng-show='showPanel', ng-class='{fade: showPanel}')
-      div.panel-heading Result 
+      div.panel-heading Interventions pour {{client.forename}} {{client.name}}
       table.scrollTable.table.table-striped
         thead
           tr

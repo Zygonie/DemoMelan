@@ -12,6 +12,10 @@ function ctrlClientDetails($scope, $log, $route, $http, $location, $routeParams,
     $scope.opened = false;
     $scope.flash = FlashService;
     $scope.flash.clear();
+    $scope.slideupErr = true;
+    $scope.slidedownErr = false;
+    $scope.slideupSucc = true;
+    $scope.slidedownSucc = false;
     
     $scope.open = function($event) {
       $event.preventDefault();
@@ -20,8 +24,14 @@ function ctrlClientDetails($scope, $log, $route, $http, $location, $routeParams,
     };
     
     $scope.clearFlash = function(){$timeout(function(){
+      $scope.slideupErr = true;
+      $scope.slidedownErr = false;
+      $scope.slideupSucc = true;
+      $scope.slidedownSucc = false;
+      $timeout(function(){
         $scope.flash.clear();
-    }, 5000);};
+      },800);
+    }, 3000);};
     
     // Disable weekend selection
     $scope.disabled = function(date, mode) {
@@ -32,21 +42,6 @@ function ctrlClientDetails($scope, $log, $route, $http, $location, $routeParams,
       formatYear: 'yyyy',
       startingDay: 1
     };
-      
-    //Get client
-    Api.Clients.get({clientID: $scope.clientID}, function(res){
-        if(res.length === 0){
-          $scope.flash.showError('Aucun client trouvé');
-          $scope.clearFlash();
-        }
-        else{
-          $scope.client = res;
-        }
-    },function (err) { //error
-        $log.log("Impossible de trouver le client");
-        $scope.flash.showError("Impossible de trouver le client : " + err.data.error);
-        $scope.clearFlash();
-    });
 
     //Get its interventions
     GetAllInterventionOfClient();
@@ -57,7 +52,7 @@ function ctrlClientDetails($scope, $log, $route, $http, $location, $routeParams,
   };
   
   var GetAllInterventionOfClient = function(){
-    Api.Interventions.query({clientID: $scope.clientID}, function(interventions){  
+    Api.Interventions.query({client: $scope.clientID}, function(interventions){  
       if(interventions.length === 0){
           $scope.flash.showError('Aucune intervention trouvée');
           $scope.clearFlash();
@@ -91,51 +86,74 @@ function ctrlClientDetails($scope, $log, $route, $http, $location, $routeParams,
     }
   };
   
+  var UpdateList = function(intervention){
+    for(var i=0;i<$scope.interventions.length;i++){
+      if($scope.interventions[i]._id === intervention._id){
+        $scope.interventions[i] = intervention;
+      }
+    }
+  };
+  
+  var ShowSuccessMessage = function(message){
+    $scope.flash.showSuccess(message);
+    $scope.slideupSucc = false;
+    $scope.slidedownSucc = true;
+    $scope.clearFlash();
+  };
+  
+  var ShowErrorMessage = function(message){
+    $scope.flash.showError(message);
+    $scope.slideupErr = false;
+    $scope.slidedownErr = true;
+    $scope.clearFlash();
+  };
+  
   $scope.saveIntervention = function(){
     $scope.flash.clear();
+    // Update
     if($scope.intervention._id){
       var type = $scope.intervention.type;
       $scope.intervention.type = $scope.intervention.type._id;
+      $scope.intervention.client = $scope.intervention.client._id;
       $scope.intervention.$save({ Id: $scope.intervention._id },
         function (intervention) { //success
           if (intervention){
-            $scope.flash.showSuccess('Intervention mise à jour');
-            GetAllInterventionOfClient();
+            ShowSuccessMessage('Intervention mise à jour');
+            UpdateList(intervention);
             InitializeInterventionPanel();
-            $scope.clearFlash();
           }
         },
         function (err) { //error
           $log.log("Impossible de mettre à jour l'intervention");
-          $scope.flash.showError("L'intervention n'a pu être mise à jour : " + err.data.error);
-          $scope.clearFlash();
+          ShowErrorMessage("L'intervention n'a pu être mise à jour : " + err.data.error);
+          InitializeInterventionPanel();
         });
     }
+    // Save
     else{
-      $scope.intervention.clientID = $scope.client._id;
+      $scope.intervention.client = $scope.clientID;
       $scope.intervention.type = $scope.intervention.type._id;
       var newItem = new Api.Interventions($scope.intervention);
       newItem.$save(function(intervention) {
         if(!intervention){
           $log.log('Impossible to create new intervention');
-          $scope.flash.showError("La nouvelle intervention n'a pu être créé.");
-          $scope.clearFlash();
+          ShowErrorMessage("La nouvelle intervention n'a pu être créé.");
+          InitializeInterventionPanel();
         }
         else {
-          $scope.flash.showSuccess('Intervention ajoutée');
-          GetAllInterventionOfClient();
+          ShowSuccessMessage('Intervention ajoutée');
+          $scope.interventions.push(intervention);
           InitializeInterventionPanel();
-          $scope.clearFlash();
         }
       },
       function(error){
-        $scope.flash.showError('Impossible de créer la nouvelle intervention : ' + error.data.error);
-        $scope.clearFlash();
+        ShowErrorMessage('Impossible de créer la nouvelle intervention : ' + error.data.error);
+        InitializeInterventionPanel();
       });
     }
   };
   
-  $scope.removeIntervention = function (intervention, e) {
+  $scope.removeIntervention = function (intervention, e) {    
     $scope.flash.clear();
     if (e) {
       e.preventDefault(); //pour empecher que le content soit développé
@@ -144,25 +162,22 @@ function ctrlClientDetails($scope, $log, $route, $http, $location, $routeParams,
     var id = intervention._id;
     intervention.$remove({ Id: id },
       function (removedIntervention) { //success
+    	InitializeInterventionPanel();
         for (var idx in $scope.interventions) {
           if ($scope.interventions[idx] === removedIntervention) {
             $scope.interventions.splice(idx, 1);
           }
         }
+        ShowSuccessMessage('Intervention supprimée');
       },
       function (err) { //error
-        $scope.flash.showError("Impossible de supprimer l'intervention : " + err.data.error);
-        $scope.clearFlash();
+        ShowErrorMessage("Impossible de supprimer l'intervention : " + err.data.error);
+        InitializeInterventionPanel();
       });
   };
   
   $scope.showIntervention =function(intervention){
-    $scope.intervention = intervention;
-    $scope.types.forEach(function(item){
-      if(item.name === intervention.type.name){
-        intervention.type = item;
-      }
-    });
+    $scope.intervention = angular.copy(intervention);
   };
   
 }

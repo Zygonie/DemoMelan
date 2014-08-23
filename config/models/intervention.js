@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
 	
 // Intervention schema
 var InterventionSchema = new Schema({
-  clientID: { type : Schema.ObjectId, ref : 'Client', required: true },
+  client: { type : Schema.ObjectId, ref : 'Client', required: true },
   type: { type : Schema.ObjectId, ref : 'InterventionType', required: true },
   notes: { type: String },
   price: { type: Number, required: true },

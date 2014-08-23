@@ -7,12 +7,22 @@ function ctrlInterventions($scope, $log, $route, $http, $window, $timeout, Api, 
     $scope.intervention = {};
     $scope.flash = FlashService;
     $scope.flash.clear();
+    $scope.slideupErr = true;
+    $scope.slidedownErr = false;
+    $scope.slideupSucc = true;
+    $scope.slidedownSucc = false;
 
     GetAllInterventionTypes();
     
     $scope.clearFlash = function(){$timeout(function(){
-        $scope.flash.clear();
-      }, 5000);};
+        $scope.slideupErr = true;
+        $scope.slidedownErr = false;
+        $scope.slideupSucc = true;
+        $scope.slidedownSucc = false;
+        $timeout(function(){
+          $scope.flash.clear();
+        },800);
+      }, 3000);};
   };
   
   var GetAllInterventionTypes = function(next){
@@ -22,45 +32,68 @@ function ctrlInterventions($scope, $log, $route, $http, $window, $timeout, Api, 
     });
   };
   
-  $scope.addInterventionType = function(){
+  var UpdateList = function(intervention){
+    for(var i=0;i<$scope.interventions.length;i++){
+      if($scope.interventions[i]._id === intervention._id){
+        $scope.interventions[i] = intervention;
+      }
+    }
+  };
+  
+  var ShowSuccessMessage = function(message){
+    $scope.flash.showSuccess(message);
+    $scope.slideupSucc = false;
+    $scope.slidedownSucc = true;
+    $scope.clearFlash();
+  };
+	  
+  var ShowErrorMessage = function(message){
+    $scope.flash.showError(message);
+    $scope.slideupErr = false;
+    $scope.slidedownErr = true;
+    $scope.clearFlash();
+  };
+  
+  $scope.saveInterventionType = function(){
+    // Update
     if($scope.intervention._id){
       $scope.intervention.$save({ Id: $scope.intervention._id },
         function (intervention) { //success
           if (intervention){
-            $scope.flash.showSuccess('Intervention mise à jour');
-            $scope.clearFlash();
-            GetAllInterventionTypes(function(){$scope.intervention = {};});            
+            ShowSuccessMessage('Intervention mise à jour');
+            UpdateList(intervention);
+            $scope.intervention = {};
           }
         },
         function (err) { //error
           $log.log("Impossible de mettre à jour l'intervention : " + err.data.error);
-          $scope.flash.showError("La nouvelle intervention n'a pu être mise à jour : " + err.data.error);
-          $scope.clearFlash();
+          ShowErrorMessage("La nouvelle intervention n'a pu être mise à jour : " + err.data.error);     
+          $scope.intervention = {};
         });
     }
+    // Save
     else{
       var newInterventionType = new Api.InterventionTypes($scope.intervention);
       newInterventionType.$save(function(intervention){
         if(!intervention){
           $log.log('Impossible to create new intervention');
-          $scope.flash.showError("La nouvelle intervention n'a pu être créé");
-          $scope.clearFlash();
+          ShowErrorMessage("La nouvelle intervention n'a pu être créé");
+          $scope.intervention = {};
         }
         else {
-          $scope.flash.showSuccess('Intervention ajouté');
-          GetAllInterventionTypes(function(){$scope.intervention = {};});
-          $scope.clearFlash();
+          ShowSuccessMessage('Intervention ajouté');
+          $scope.intervention = {};
         }
       },
       function(error){
-        $scope.flash.showError('Impossible de créer la nouvelle intervention ' + error.data.error);
-        $scope.clearFlash();
+        ShowErrorMessage('Impossible de créer la nouvelle intervention ' + error.data.error);
+        $scope.intervention = {};
       });
     }
   };
   
   $scope.showInterventionType = function(interventionType){
-    $scope.intervention = interventionType;
+    $scope.intervention = angular.copy(interventionType);
   };
   
   $scope.removeInterventionType = function(item, e){
@@ -79,8 +112,8 @@ function ctrlInterventions($scope, $log, $route, $http, $window, $timeout, Api, 
         }
       },
       function (err) { //error
-        $scope.flash.showError("Impossible de supprimer le type d'intervention " + err.data.error);
-        $scope.clearFlash();
+        ShowErrorMessage("Impossible de supprimer le type d'intervention " + err.data.error);
+        $scope.intervention = {};
       });
   };
 }

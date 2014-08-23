@@ -74,3 +74,22 @@ a {
   animation-duration: 1s;
   animation-fill-mode: forwards; 
 }
+
+.slideup, .slidedown {
+  top: -60px;
+  position: fixed;  
+  right: 0;
+  left: 0;
+  z-index: 1050;
+  border-radius: 0;
+  font-size: 18px;
+  height: 60px;            
+  overflow-y: hidden;
+  -webkit-transition: top 0.5s ease-in-out;
+  -moz-transition: top 0.5s ease-in-out;
+  -o-transition: top 0.5s ease-in-out;
+  transition: top 0.5s ease-in-out;
+}
+.slidedown {            
+  top: 0;                    
+}    
